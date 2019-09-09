@@ -34,9 +34,11 @@
 			</c:when>
 			
 			<c:otherwise>
-				<c:forEach items="${book }" var="b">
-					<a href="getBookByIsbn.do?search=${b.isbn }">${b.title}</a>
-				</c:forEach>
+				<ul>
+					<c:forEach items="${book }" var="b">
+						<li><a href="getBookByIsbn.do?search=${b.isbn }">${b.title}</a></li>
+					</c:forEach>
+				</ul>	
 			</c:otherwise>
 			
 		</c:choose>
