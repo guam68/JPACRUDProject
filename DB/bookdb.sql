@@ -31,9 +31,7 @@ CREATE TABLE IF NOT EXISTS `book` (
   `num_pages` INT UNSIGNED NULL,
   `ratings_count` INT UNSIGNED NULL,
   `text_reviews_count` INT UNSIGNED NULL,
-  PRIMARY KEY (`book_id`),
-  UNIQUE INDEX `isbn13_UNIQUE` (`isbn13` ASC),
-  UNIQUE INDEX `isbn_UNIQUE` (`isbn` ASC))
+  PRIMARY KEY (`book_id`))
 ENGINE = InnoDB;
 
 SET SQL_MODE = '';

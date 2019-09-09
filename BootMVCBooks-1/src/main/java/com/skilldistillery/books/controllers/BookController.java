@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -25,24 +26,39 @@ public class BookController {
 		return mv;
 	}
 
-	@RequestMapping(path = "getBook.do", method = RequestMethod.GET, params = "isbn")
-	public ModelAndView getBookByISBN(String isbn) {
+	@RequestMapping(path = "getBookByIsbn.do", method = RequestMethod.GET, params = "search")
+	public ModelAndView getBookByISBN(String search) {
 		ModelAndView mv = new ModelAndView("bookDetail");
-		Book book = null;
-		if (isbn.length() == 13) {
+		List<Book> book = null;
+		if (search.length() == 13) {
 			try {
-				int isbn13 = Integer.valueOf(isbn);
+				System.out.println("in13");
+				long isbn13 = Long.valueOf(search);
+				System.out.println(isbn13);
 				book = dao.findBookByISBN13(isbn13);
+				System.out.println(book);
 			} catch (NumberFormatException e) {
-				book = dao.findBookByISBN(isbn);
+				System.out.println(e);
+				book = dao.findBookByISBN(search);
 			}
 		} else {
-			book = dao.findBookByISBN(isbn);
+				System.out.println("fallback");
+			book = dao.findBookByISBN(search);
 		}
 		mv.addObject("book", book);
+		System.out.println("finish get book mapping");
 		return mv;
 	}
-	
+
+	@RequestMapping(path = "getBookByKeyword.do", method = RequestMethod.GET, params = "search")
+	public ModelAndView getBookByKeyword(String search) {
+		ModelAndView mv = new ModelAndView("bookDetail");
+		List<Book> books = null;
+		books = dao.findBookByKeyword(search);
+		mv.addObject("book", books);
+		return mv;
+	}
+
 	@RequestMapping(path = "deleteBook.do", method = RequestMethod.GET, params = "id")
 	public ModelAndView deleteBook(int id, RedirectAttributes redAttrs) {
 		ModelAndView mv = new ModelAndView("redirect:/");
@@ -51,6 +67,46 @@ public class BookController {
 		} else {
 			redAttrs.addFlashAttribute("message", "Failed to delete book");
 		}
+		return mv;
+	}
+
+	@RequestMapping(path = "showUpdateForm.do", method = RequestMethod.GET, params = "id")
+	public ModelAndView updateBook(Integer id) {
+		ModelAndView mv = new ModelAndView("form");
+		mv.addObject("book", new Book());
+		mv.addObject("id", id);
+		return mv;
+	}
+
+	@RequestMapping(path = "updateBook.do", method = RequestMethod.POST)
+	public ModelAndView updateBook(Book book, Errors errors, RedirectAttributes redAttrs) {
+		ModelAndView mv = new ModelAndView();
+		if (errors.hasErrors()) {
+			mv.setViewName("redirect:/");
+			redAttrs.addFlashAttribute("message", "Could not update book");
+		} else {
+			dao.updateBook(book);
+			redAttrs.addFlashAttribute("message", "Book has been updated");
+			mv.setViewName("redirect:/");
+//			mv.addObject("book", book);
+		}
+
+		return mv;
+	}
+
+	@RequestMapping(path = "createBook.do", method = RequestMethod.POST)
+	public ModelAndView createBook(Book book, Errors errors, RedirectAttributes redAttrs) {
+		ModelAndView mv = new ModelAndView();
+		if (errors.hasErrors()) {
+			mv.setViewName("redirect:/");
+			redAttrs.addFlashAttribute("message", "Could not create book");
+		} else {
+			dao.updateBook(book);
+			redAttrs.addFlashAttribute("message", "Book Added");
+			mv.setViewName("redirect:/");
+//			mv.addObject("book", book);
+		}
+
 		return mv;
 	}
 
